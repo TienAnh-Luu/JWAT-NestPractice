@@ -1,18 +1,47 @@
 // users.service.ts
 
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { User } from './interfaces/user.interface';
 
 @Injectable()
 export class UsersService {
   private readonly userList: User[] = []; // Initialize with an empty array
 
-  findAll(): User[] {
-    return this.userList;
+  search(params?: {
+    username?: string;
+    fullname?: string;
+    role?: string;
+    projects?: string[];
+    activeYn?: 'Y' | 'N';
+  }): User[] {
+    // If no parameters are provided, return the full userList
+    if (!params || Object.keys(params).length === 0) {
+      return this.userList;
+    }
+
+    return this.userList.filter((user) => {
+      return (
+        (!params.username || user.username === params.username) &&
+        (!params.fullname || user.fullname === params.fullname) &&
+        (!params.role || user.role === params.role) &&
+        (!params.projects ||
+          params.projects.every((project) =>
+            user.projects.includes(project),
+          )) &&
+        (!params.activeYn || user.activeYn === params.activeYn)
+      );
+    });
   }
 
   create(newUser: User): void {
-    // Add validation logic here (e.g., check if username is unique)
+    const userExists = this.userList.some(
+      (user) => user.username === newUser.username,
+    );
+
+    if (userExists) {
+      throw new BadRequestException('Username already exists');
+    }
+
     this.userList.push(newUser);
   }
 

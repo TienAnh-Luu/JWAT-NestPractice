@@ -8,17 +8,19 @@ import {
   Patch,
   Delete,
   Param,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './interfaces/user.interface';
+import { SearchUsersDto } from './dto/search-users.dto';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  findAll(): User[] {
-    return this.usersService.findAll();
+  searchUsers(@Query() query: SearchUsersDto): User[] {
+    return this.usersService.search(query);
   }
 
   @Post()
