@@ -1,11 +1,93 @@
 // users.service.ts
 
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { User } from './interfaces/user.interface';
 
 @Injectable()
 export class UsersService {
-  private readonly userList: User[] = []; // Initialize with an empty array
+  private readonly userList: User[] = [
+    {
+      username: 'nva',
+      fullname: 'Nguyen Van A',
+      role: 'Developer',
+      activeYn: 'Y',
+      projects: ['project1', 'project2'],
+    },
+    {
+      username: 'nvb',
+      fullname: 'Nguyen Van B',
+      role: 'Developer',
+      activeYn: 'Y',
+      projects: ['project3', 'project4'],
+    },
+    {
+      username: 'nvc',
+      fullname: 'Nguyen Van C',
+      role: 'Developer',
+      activeYn: 'Y',
+      projects: ['project5', 'project6'],
+    },
+    {
+      username: 'nvd',
+      fullname: 'Nguyen Van D',
+      role: 'Developer',
+      activeYn: 'N',
+      projects: ['project5', 'project6'],
+    },
+    {
+      username: 'nve',
+      fullname: 'Nguyen Van E',
+      role: 'HR',
+      activeYn: 'N',
+      projects: ['project5', 'project6'],
+    },
+    {
+      username: 'nvf',
+      fullname: 'Nguyen Van F',
+      role: 'Security',
+      activeYn: 'Y',
+      projects: ['project5', 'project6'],
+    },
+    {
+      username: 'nvg',
+      fullname: 'Nguyen Van G',
+      role: 'Customer',
+      activeYn: 'N',
+      projects: ['project5', 'project6'],
+    },
+    {
+      username: 'nvh',
+      fullname: 'Nguyen Van H',
+      role: 'Developer',
+      activeYn: 'Y',
+      projects: ['project8', 'project9'],
+    },
+    {
+      username: 'nvi',
+      fullname: 'Nguyen Van I',
+      role: 'Developer',
+      activeYn: 'Y',
+      projects: ['project5', 'project6'],
+    },
+    {
+      username: 'nvj',
+      fullname: 'Nguyen Van J',
+      role: 'Developer',
+      activeYn: 'N',
+      projects: ['project5', 'project6'],
+    },
+    {
+      username: 'nvk',
+      fullname: 'Nguyen Van K',
+      role: 'Developer',
+      activeYn: 'Y',
+      projects: ['project5', 'project6'],
+    },
+  ];
 
   search(params?: {
     username?: string;
@@ -34,6 +116,7 @@ export class UsersService {
   }
 
   create(newUser: User): void {
+    console.log('User: ', newUser);
     const userExists = this.userList.some(
       (user) => user.username === newUser.username,
     );
@@ -50,22 +133,26 @@ export class UsersService {
     const existingUser = this.userList.find(
       (user) => user.username === username,
     );
-    if (existingUser) {
-      // Update properties (role, fullname, etc.)
-      existingUser.role = updatedUser.role;
-      existingUser.fullname = updatedUser.fullname;
-      existingUser.activeYn = updatedUser.activeYn;
-      existingUser.projects = updatedUser.projects;
+
+    if (!existingUser) {
+      throw new NotFoundException(`User with username ${username} not found`);
     }
+
+    existingUser.role = updatedUser.role;
+    existingUser.fullname = updatedUser.fullname;
+    existingUser.activeYn = updatedUser.activeYn;
+    existingUser.projects = updatedUser.projects;
   }
 
   delete(username: string): void {
-    // Remove the user by username
     const userIndex = this.userList.findIndex(
       (user) => user.username === username,
     );
-    if (userIndex !== -1) {
-      this.userList.splice(userIndex, 1);
+
+    if (userIndex === -1) {
+      throw new NotFoundException(`User with username ${username} not found`);
     }
+
+    this.userList.splice(userIndex, 1);
   }
 }
